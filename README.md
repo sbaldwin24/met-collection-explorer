@@ -39,3 +39,22 @@ This application allows users to browse the Metropolitan Museum of Art's collect
 * **Progress:**
 Update at a later time
 
+### Component Implementation & Data Fetching (Phase 2)
+
+* **Goal:** API definions, fetch functions, and 
+
+* Define API endpoint constants
+    * Create `lib/met-api.ts` for API fetching logic.
+        * `fetchDepartments()`: Fetches the list of departments
+        * `searchObjects(params)`: Searches objects based on query, department, etc. Returns object IDs and total count
+        * `fetchObjectDetails(objectId)`: Fetches details for a single object
+    * Define TypeScript types for API responses (`Department`, `ObjectSearchResult`, `ObjectDetails`)
+    * Create `app/layout.tsx` with basic HTML structure, Tailwind integration, and font setup
+    * Create `app/page.tsx` as the main entry point
+        * Fetch departments server-side or client-side for the filter
+        * Set up placeholders for ``search-bar`, `dropdown-filter`, `object-grid`, `object-card`, `and pagination-controls`
+
+    * Starting with basic API functions. Error handling and loading states will be added progressively
+* **Progress:** Initial structure and API utilities defined. Main page layout created with placeholders
+* **Next Steps:** Implement the actual components - `search-bar`, `dropdown-filter`, `object-grid`, `object-card`, `pagination-controls` - and integrate them into `page.tsx`. Fetch and display data
+
