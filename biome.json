@@ -1,0 +1,91 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "ignore": [
+      "build/**/*",
+      "dist/**/*",
+      "node_modules"
+    ],
+    "include": [
+      "*.{ts,tsx}",
+      "**/*.{ts,tsx}",
+      "**/**/*.{ts,tsx}",
+      "**/**/**/*.{ts,tsx}",
+      "**/**/**/**/*.{ts,tsx}",
+      "**/**/**/**/**/*.{ts,tsx}",
+      "*.ts",
+      "*.tsx"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "recommended": true,
+        "all": false,
+        "noSvgWithoutTitle": "off",
+        "noAriaHiddenOnFocusable": "off",
+        "noBlankTarget": "off"
+      },
+      "correctness": {
+        "noUnusedFunctionParameters": {
+          "level": "warn",
+          "fix": "unsafe"
+        },
+        "noUnusedImports": {
+          "level": "warn",
+          "fix": "unsafe"
+        },
+        "noUnusedLabels": {
+          "level": "warn",
+          "fix": "unsafe"
+        },
+        "noUnusedPrivateClassMembers": {
+          "level": "warn",
+          "fix": "unsafe"
+        },
+        "noUnusedVariables": {
+          "level": "error",
+          "fix": "unsafe"
+        },
+        "useExhaustiveDependencies": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noConsole": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "asNeeded",
+      "bracketSameLine": false,
+      "bracketSpacing": true,
+      "enabled": true,
+      "jsxQuoteStyle": "double",
+      "lineEnding": "lf",
+      "lineWidth": 120,
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "none"
+    }
+  }
+}
