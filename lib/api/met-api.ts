@@ -1,32 +1,6 @@
 import { departmentSchema, objectDetailsSchema } from '@/lib/schemas'; // Assuming these are Zod schemas
+import type { Department, ObjectDetails, SearchParams } from '@/lib/types';
 import { z } from 'zod';
-
-export type Department = z.infer<typeof departmentSchema>;
-
-/**
- * Represents the detailed information for a single object from the Met Museum API
- * Ensures `isTimelineWork` is always `boolean | null`
- */
-export interface ObjectDetails extends Omit<z.infer<typeof objectDetailsSchema>, 'isTimelineWork'> {
-  isTimelineWork: boolean | null;
-}
-
-/**
- * Search parameters for the Met Museum API `/search` endpoint
- * @see https://metmuseum.github.io/
- */
-export interface SearchParams {
-  q: string; // REQUIRED: The search query. Use '*' for all objects if filtering only by other params
-  departmentId?: number;
-  isHighlight?: boolean;
-  isOnView?: boolean;
-  artistOrCulture?: boolean;
-  medium?: string | string[];
-  hasImages?: boolean;
-  geoLocation?: string;
-  dateBegin?: number;
-  dateEnd?: number;
-}
 
 /**
  * Configuration for Next.js fetch caching
@@ -45,7 +19,6 @@ const objectListResponseSchema = z.object({
   total: z.number().int().nonnegative(),
   objectIDs: z.array(z.number().int().positive()).nullable()
 });
-
 /** TypeScript type inferred from objectListResponseSchema */
 type ObjectListResponse = z.infer<typeof objectListResponseSchema>;
 
@@ -53,18 +26,16 @@ type ObjectListResponse = z.infer<typeof objectListResponseSchema>;
  * Zod schema for the response structure of the departments endpoint
  */
 const departmentsResponseSchema = z.object({
-  departments: z.array(departmentSchema) // Uses the imported departmentSchema
+  departments: z.array(departmentSchema)
 });
-
 
 const API_BASE_URL = 'https://collectionapi.metmuseum.org/public/collection/v1';
 
 /** Symbol to indicate that a resource was not found (HTTP 404) */
 export const NOT_FOUND = Symbol('NOT_FOUND');
 
-
 /**
- * Custom error class for API-specific issues encountered wheninteracting with the Met Museum API
+ * Custom error class for API-specific issues encountered when interacting with the Met Museum API
  */
 export class MetApiError extends Error {
   constructor(
@@ -74,15 +45,14 @@ export class MetApiError extends Error {
   ) {
     super(message);
     this.name = 'MetApiError';
-    // Maintain prototype chain for instanceof checks
+
     Object.setPrototypeOf(this, MetApiError.prototype);
   }
 }
 
-
 /**
  * Builds RequestInit object for fetch, incorporating Next.js cache options
- *
+
  * @param cacheConfig - Optional cache configuration
  * @returns RequestInit object or undefined
  */
@@ -108,7 +78,7 @@ function buildRequestInit(cacheConfig?: CacheConfig): RequestInit | undefined {
  *
  * @param url - The full URL to fetch
  * @param options - Standard fetch RequestInit options
- * @returns A Promise resolving to the parsed JSON data(T), null, or NOT_FOUND symbol
+ * @returns A Promise resolving to the parsed JSON data(T), null -> for empty 200/204 or unparsable JSON, or NOT_FOUND symbol
  * @throws {MetApiError} For API errors - non-2xx status codes other than 404
  * @throws {Error} For network errors or unexpected issues during fetch/parsing
  */
@@ -122,11 +92,13 @@ async function fetchApiInternal<T>(url: string, options?: RequestInit): Promise<
 
     if (!response.ok) {
       let errorBodyText = 'No error body received';
+
       try {
         errorBodyText = await response.text();
         /** Attempt to parse for a structured error message, but fall back gracefully */
         const errorJson = JSON.parse(errorBodyText);
         const message = errorJson.message || `API Error ${response.status}: ${response.statusText}`;
+
         throw new MetApiError(message, response.status, errorBodyText);
       } catch (parseOrTextError) {
         /** If parsing JSON fails or text() fails, use the original text or a generic message */
@@ -145,10 +117,10 @@ async function fetchApiInternal<T>(url: string, options?: RequestInit): Promise<
 
     try {
       const data = await response.json();
+
       return data as T;
     } catch (jsonParseError) {
       if (jsonParseError instanceof SyntaxError) {
-        /** Likely an empty or non-JSON body for a 200/2xx response */
         console.warn(
           `fetchApiInternal: Successfully fetched but failed to parse JSON for URL ${url}. Response might be empty or not valid JSON. Status: ${response.status}. Returning null.`
         );
@@ -164,21 +136,19 @@ async function fetchApiInternal<T>(url: string, options?: RequestInit): Promise<
     }
   } catch (error) {
     if (error instanceof MetApiError) {
-      throw error; // Re throw MetApiError instances directly
+      throw error;
     }
     console.error(`fetchApiInternal: Network or unexpected fetch error for URL ${url}:`, error);
-    throw new Error(
-      /** Wrap other errors */
-      `Network or fetch error: ${error instanceof Error ? error.message : String(error)}`
-    );
+
+    throw new Error(`Network or fetch error: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
 /**
  * Fetches object IDs from the Met Museum API's /objects endpoint
  *
- * @param params - Optional parameters for filtering
- * @param params.departmentIds - Department ID(s). Only the first ID is used if an array
+ * @param params - Optional parameters for filtering.
+ * @param params.departmentIds - Department IDs - only the first ID is used if an array
  * @param params.metadataDate - Metadata date (YYYY-MM-DD)
  * @param cacheConfig - Optional Next.js cache configuration
  * @returns Promise resolving to total count and list of object IDs, or a default empty state on error/not found
@@ -194,7 +164,7 @@ export async function fetchObjectIds(
 
   if (params.departmentIds) {
     const departmentId = Array.isArray(params.departmentIds) ? params.departmentIds[0] : params.departmentIds;
-    /** Check that departmentId is a positive number before appending */
+
     if (typeof departmentId === 'number' && departmentId > 0) {
       endpointUrl.searchParams.append('departmentIds', String(departmentId));
     }
@@ -208,7 +178,6 @@ export async function fetchObjectIds(
   const defaultResponse: ObjectListResponse = { total: 0, objectIDs: null };
 
   try {
-    /** Returns either parsed ObjectListResponse, null, or NOT_FOUND symbol */
     const rawData = await fetchApiInternal<unknown>(endpointUrl.toString(), requestInit);
 
     if (rawData === NOT_FOUND || rawData === null) {
@@ -216,6 +185,7 @@ export async function fetchObjectIds(
     }
 
     const validationResult = objectListResponseSchema.safeParse(rawData);
+
     if (!validationResult.success) {
       console.error(
         `fetchObjectIds: Failed to validate response data from ${endpointUrl.toString()}:`,
@@ -264,6 +234,7 @@ export async function fetchObjectDetails(
 
     if (rawData === null) {
       console.warn(`fetchObjectDetails: Received null data for object ID ${objectId}, treating as fetch error.`);
+
       return null;
     }
 
@@ -306,7 +277,6 @@ export async function fetchDepartments(cacheConfig?: CacheConfig): Promise<{ dep
   const defaultResponse = { departments: [] };
 
   try {
-    /** Expecting { departments: [...] } */
     const rawData = await fetchApiInternal<unknown>(endpointUrl, requestInit);
 
     if (rawData === NOT_FOUND || rawData === null) {
@@ -314,6 +284,7 @@ export async function fetchDepartments(cacheConfig?: CacheConfig): Promise<{ dep
     }
 
     const validationResult = departmentsResponseSchema.safeParse(rawData);
+
     if (!validationResult.success) {
       console.error(
         `fetchDepartments: Failed to validate response data from ${endpointUrl}:`,
@@ -348,9 +319,9 @@ export async function searchObjects(params: SearchParams, cacheConfig?: CacheCon
   }
 
   const endpointUrl = new URL(`${API_BASE_URL}/search`);
+
   endpointUrl.searchParams.append('q', params.q.trim());
 
-  /** Optional parameters */
   if (params.departmentId !== undefined && params.departmentId > 0) {
     endpointUrl.searchParams.append('departmentId', String(params.departmentId));
   }
@@ -376,10 +347,9 @@ export async function searchObjects(params: SearchParams, cacheConfig?: CacheCon
   }
 
   if (params.hasImages === true) {
-    /** Explicitly check for true */
     endpointUrl.searchParams.append('hasImages', 'true');
   }
-  /** Probably wont use many of these params */
+
   if (params.geoLocation && params.geoLocation.trim() !== '') {
     endpointUrl.searchParams.append('geoLocation', params.geoLocation);
   }
@@ -403,6 +373,7 @@ export async function searchObjects(params: SearchParams, cacheConfig?: CacheCon
     }
 
     const validationResult = objectListResponseSchema.safeParse(rawData);
+
     if (!validationResult.success) {
       console.error(
         `searchObjects: Failed to validate response data from ${endpointUrl.toString()}:`,
@@ -411,7 +382,6 @@ export async function searchObjects(params: SearchParams, cacheConfig?: CacheCon
 
       return defaultResponse;
     }
-
     return validationResult.data;
   } catch (error) {
     console.error(
