@@ -7,7 +7,7 @@ import type { Department } from '@/lib/types';
 import { Search, X } from 'lucide-react';
 import type { FC, FormEvent } from 'react';
 import { useState } from 'react';
-import FilterDropdown from './filter-dropdown';
+import FilterDropdown from './department-filter-menu';
 import ShowOnlyFilters from './show-only-filters';
 
 interface SearchBarProps {
@@ -18,6 +18,13 @@ interface SearchBarProps {
   setQuery: (q: string) => void;
   setSearchByValue: (v: string) => void;
   onSubmit: (q: string, by: string) => void;
+  currentDepartmentId: string;
+  filters: {
+    highlights: boolean;
+    hasImages: boolean;
+    onDisplay: boolean;
+    openAccess: boolean;
+  };
 }
 
 const SEARCH_BY_OPTIONS = [
@@ -33,7 +40,9 @@ const SearchBar: FC<SearchBarProps> = ({
   setQuery,
   setSearchByValue,
   onSubmit,
-  basePath
+  basePath,
+  currentDepartmentId,
+  filters
 }) => {
   /** Local state for the input field */
   const [inputValue, setInputValue] = useState(query);
@@ -70,6 +79,7 @@ const SearchBar: FC<SearchBarProps> = ({
         <form onSubmit={handleSearch}>
           <div className="w-full">
             <div className="flex md:flex-row flex-col items-stretch gap-y-2 md:gap-x-2 md:gap-y-0 w-full">
+              {/* Select - Search by */}
               <Select value={searchBy} onValueChange={handleSearchByChange}>
                 <SelectTrigger
                   className="bg-card shadow-sm border-border rounded-md w-full md:w-[230px] text-card-foreground"
@@ -117,12 +127,12 @@ const SearchBar: FC<SearchBarProps> = ({
                 <Search aria-hidden="true" className="w-4 h-4" />
               </Button>
               <div className="w-full md:w-auto">
-                <FilterDropdown departments={departments} basePath="/" />
+                <FilterDropdown departments={departments} basePath="/" currentDepartmentId={currentDepartmentId} />
               </div>
             </div>
             <div className="w-full">
               <div className="flex justify-start mt-4 w-full md:w-auto">
-                <ShowOnlyFilters basePath={basePath} />
+                <ShowOnlyFilters basePath={basePath} filters={filters} />
               </div>
             </div>
           </div>

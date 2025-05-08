@@ -2,7 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import type { Filter } from '@/lib/types';
 import { X } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import type { FC } from 'react';
 
 const FILTERS = [
@@ -14,6 +14,12 @@ const FILTERS = [
 
 interface ShowOnlyFiltersProps {
   basePath: string;
+  filters: {
+    highlights: boolean;
+    hasImages: boolean;
+    onDisplay: boolean;
+    openAccess: boolean;
+  };
 }
 
 const paramKeyMap: Record<string, string> = {
@@ -23,24 +29,14 @@ const paramKeyMap: Record<string, string> = {
   openAccess: 'openAccess'
 };
 
-const ShowOnlyFilters: FC<ShowOnlyFiltersProps> = ({ basePath }) => {
+const ShowOnlyFilters: FC<ShowOnlyFiltersProps> = ({ basePath, filters }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  // --- URL-Driven Filter State Pattern ---
-  // All filter state is derived from the URL (searchParams)
-  // The UI always reflects the URL, and any change updates the URL
-  const isActive = (key: string) => {
-    const paramKey = paramKeyMap[key] || key;
-    return searchParams.get(paramKey) === 'true';
-  };
+  const activeFilters = FILTERS.filter(({ key }) => filters[key as keyof typeof filters]).map(f => f.key);
 
-  const activeFilters = FILTERS.filter(({ key }) => isActive(key)).map(f => f.key);
-
-  // When a filter is toggled, update the URL
   const handleCheckedChange = (key: string) => (checked: boolean | 'indeterminate') => {
     const paramKey = paramKeyMap[key] || key;
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(window.location.search);
     if (checked === true) {
       params.set(paramKey, 'true');
     } else {
@@ -50,10 +46,9 @@ const ShowOnlyFilters: FC<ShowOnlyFiltersProps> = ({ basePath }) => {
     router.push(`${basePath}?${params.toString()}`);
   };
 
-  // When a chip is removed, update the URL
   const handleChipRemove = (key: string) => {
     const paramKey = paramKeyMap[key] || key;
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(window.location.search);
     params.delete(paramKey);
     params.set('page', '1');
     router.push(`${basePath}?${params.toString()}`);
@@ -68,7 +63,7 @@ const ShowOnlyFilters: FC<ShowOnlyFiltersProps> = ({ basePath }) => {
             <div key={key} className="flex items-center space-x-2">
               <Checkbox
                 id={`filter-${key}`}
-                checked={isActive(key)}
+                checked={filters[key as keyof typeof filters]}
                 onCheckedChange={handleCheckedChange(key)}
                 aria-labelledby={`label-${key}`}
               />

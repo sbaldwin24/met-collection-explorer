@@ -31,7 +31,6 @@ export default function EntityDetailClient({ objectDetailsPromise }: ObjectDetai
 
   const searchParams = useSearchParams();
   const from = searchParams.get('from');
-  console.log('from: ', from);
   const backToGalleryHref = from ? `/?${from}` : '/';
 
   /** State interface automatically derived from schema.ts */
@@ -43,21 +42,13 @@ export default function EntityDetailClient({ objectDetailsPromise }: ObjectDetai
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  if (!isInitiallyPromise) {
-    return (
-      <div className="mx-auto px-4 py-8 md:py-12 max-w-7xl container">
-        <p className="text-destructive">Error: objectDetailsPromise prop was initially missing or invalid.</p>
-        <Button asChild variant="outline" size="sm" className="group mt-6">
-          <Link href={backToGalleryHref} prefetch={true}>
-            <ArrowLeft aria-hidden="true" className="mr-2 w-4 h-4 transition-transform group-hover:-translate-x-1" />
-            Back to Gallery
-          </Link>
-        </Button>
-      </div>
-    );
-  }
-
+  // Hook always called regardless of conditions, fixing the rules-of-hooks issue
   useEffect(() => {
+    // Only process the Promise if it's valid
+    if (!isInitiallyPromise) {
+      return;
+    }
+    
     let cancelled = false;
 
     /** Reset state for the new promise */
@@ -102,7 +93,22 @@ export default function EntityDetailClient({ objectDetailsPromise }: ObjectDetai
       /** Cleanup function to prevent memory leaks by canceling async operations when component unmounts */
       cancelled = true;
     };
-  }, [objectDetailsPromise]);
+  }, [objectDetailsPromise, isInitiallyPromise]);
+
+  // Show error for invalid promise
+  if (!isInitiallyPromise) {
+    return (
+      <div className="mx-auto px-4 py-8 md:py-12 max-w-7xl container">
+        <p className="text-destructive">Error: objectDetailsPromise prop was initially missing or invalid.</p>
+        <Button asChild variant="outline" size="sm" className="group mt-6">
+          <Link href={backToGalleryHref} prefetch={true}>
+            <ArrowLeft aria-hidden="true" className="mr-2 w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            Back to Gallery
+          </Link>
+        </Button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -147,7 +153,7 @@ export default function EntityDetailClient({ objectDetailsPromise }: ObjectDetai
       <div className="mx-auto px-4 py-8 md:py-12 max-w-7xl text-center container">
         <h2 className="mb-4 text-destructive text-xl">Object Not Found</h2>
         <p className="mb-6 text-muted-foreground">
-          We couldn't find the details for this object. It might have been moved or the ID may be incorrect.
+          We couldn&apos;t find the details for this object. It might have been moved or the ID may be incorrect.
         </p>
         <Button asChild variant="outline" size="sm" className="group mt-6">
           <Link href={backToGalleryHref} prefetch={true}>

@@ -44,6 +44,7 @@ const FilterDropdown: FC<FilterDropdownProps> = ({ departments = [], basePath })
       >
         <SelectValue placeholder="Filter by Department" />
       </SelectTrigger>
+
       <SelectContent>
         <SelectItem value="all">All Departments</SelectItem>
         {departments.map(dept => (

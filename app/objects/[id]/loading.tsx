@@ -25,7 +25,7 @@ export default function Loading() {
       <div className="gap-6 gap-y-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
         {Array.from({ length: 12 }).map((_, index) => (
           <Card
-            key={`loading-skeleton-${index}`}
+            key={`loading-skeleton-${String(index)}`}
             className="group flex flex-col bg-card shadow-sm rounded-sm w-full h-full overflow-hidden transition-shadow duration-300"
           >
             <CardContent className="p-0">

@@ -74,18 +74,20 @@ export default function PaginationControls({ currentPage, totalPages, onPageChan
         {pageNumbers.map((page, index) => {
           if (typeof page === 'string') {
             return (
-              <li key={`ellipsis-${index}`}>
+              <li key={`ellipsis-${String(index)}`}>
                 <span className="bg-white px-3 py-2 border border-gray-300 rounded-md text-gray-700">{page}</span>
               </li>
             );
           }
 
           return (
-            <li key={page}>
+            <li key={String(index)}>
               <button
                 onClick={() => handlePageClick(page)}
-                className={`px-3 py-2 border border-gray-300 rounded-md ${
-                  currentPage === page ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
+                className={`px-3 py-2 border color-primary-dark rounded-md ${
+                  currentPage === page
+                    ? 'bg-violet-200 color-black color-primary-dark'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
                 aria-label={`Page ${page}`}
                 aria-current={currentPage === page ? 'page' : undefined}

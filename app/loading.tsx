@@ -7,17 +7,17 @@ export default function Loading() {
       {/* Search Bar & Filters Skeleton */}
       <div className="flex md:flex-row flex-col items-stretch gap-y-2 md:gap-x-2 md:gap-y-0 mb-6 w-full">
         {/* Search By Select */}
-        <Skeleton className="rounded-md w-full md:w-[230px] h-10" />
+        <Skeleton className="bg-e-gray-300 border-e-gray-500 rounded-md w-full md:w-[230px] h-10" />
         {/* Search Input */}
-        <Skeleton className="rounded-md w-full md:w-xl h-10" />
+        <Skeleton className="bg-e-gray-300 rounded-md w-full md:w-xl h-10" />
         {/* Search Button */}
-        <Skeleton className="rounded-md w-full md:w-20 h-10" />
+        <Skeleton className="bg-e-gray-300 rounded-md w-full md:w-20 h-10" />
         {/* Filter Dropdown */}
-        <Skeleton className="rounded-md w-full md:w-[250px] h-10" />
+        <Skeleton className="bg-e-gray-500 rounded-md w-full md:w-[250px] h-10" />
         {/* Has Images Checkbox */}
         <div className="flex items-center space-x-2 md:ml-4">
-          <Skeleton className="rounded w-5 h-5" />
-          <Skeleton className="rounded w-32 h-5" />
+          <Skeleton className="bg-e-gray-500 rounded w-5 h-5" />
+          <Skeleton className="bg-e-gray-500 rounded w-32 h-5" />
         </div>
       </div>
 
@@ -25,7 +25,7 @@ export default function Loading() {
       <div className="gap-6 gap-y-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mb-8">
         {Array.from({ length: 12 }).map((_, index) => (
           <Card
-            key={`loading-skeleton-${index}`}
+            key={`loading-skeleton-${String(index)}`}
             className="group flex flex-col bg-card shadow-sm rounded-sm w-full h-full overflow-hidden transition-shadow duration-300"
           >
             <CardContent className="p-0">

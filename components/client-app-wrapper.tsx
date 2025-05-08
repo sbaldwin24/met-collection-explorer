@@ -29,6 +29,15 @@ export default function ClientAppWrapper(props: ClientAppWrapperProps) {
           initialQuery={props.q}
           initialDepartmentIds={props.departmentIds}
           initialSearchBy={props.searchBy}
+          filters={{
+            highlights: false,
+            hasImages: !!props.hasImages,
+            onDisplay: !!props.isOnView,
+            openAccess: !!props.openAccess
+          }}
+          currentDepartmentId={
+            props.departmentIds && props.departmentIds.length > 0 ? String(props.departmentIds[0]) : 'all'
+          }
         />
       </div>
     </ObjectListCacheProvider>

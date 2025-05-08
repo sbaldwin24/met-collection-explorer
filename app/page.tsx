@@ -1,4 +1,3 @@
-import { fetchDepartments } from '@/lib/api/met-api';
 import { Suspense } from 'react';
 import ClientApp from './client-app';
 
@@ -24,12 +23,9 @@ interface ObjectsPageProps {
   searchParams: Promise<ResolvedSearchParams>;
 }
 
-export default async function ObjectsPage({ searchParams: searchParamsPromise }: ObjectsPageProps) {
+export default async function ObjectsPage({ searchParams }: ObjectsPageProps) {
   /** Await the search parameters from the provided promise  */
-  const resolvedSearchParams = await searchParamsPromise;
-
-  /** Fetch departments on the server */
-  const { departments } = await fetchDepartments();
+  const resolvedSearchParams = await searchParams;
 
   /** Current Page */
   const pageStr = resolvedSearchParams?.page;
@@ -68,6 +64,7 @@ export default async function ObjectsPage({ searchParams: searchParamsPromise }:
   /** Parse isOnView */
   const isOnViewStr = resolvedSearchParams?.isOnView;
   let isOnView: boolean | undefined;
+
   if (isOnViewStr === 'true') {
     isOnView = true;
   } else if (isOnViewStr === 'false') {
@@ -77,6 +74,7 @@ export default async function ObjectsPage({ searchParams: searchParamsPromise }:
   /** Parse openAccess */
   const openAccessStr = resolvedSearchParams?.openAccess;
   let openAccess: boolean | undefined;
+
   if (openAccessStr === 'true') {
     openAccess = true;
   } else if (openAccessStr === 'false') {
@@ -86,11 +84,18 @@ export default async function ObjectsPage({ searchParams: searchParamsPromise }:
   /** Search By filter  */
   const searchBy = resolvedSearchParams?.searchBy || 'all'; // Default to 'all'
 
+  /** Derive all filter state from resolvedSearchParams */
+  const filters = {
+    highlights: resolvedSearchParams?.isHighlight ?? false,
+    hasImages: hasImages ?? false,
+    onDisplay: isOnView ?? false,
+    openAccess: openAccess ?? false
+  };
+  const currentDepartmentId = resolvedSearchParams?.departmentId ?? '';
+
   /** Server side rendering - the simplest fallback */
   return (
     <div className="mx-auto px-4 max-w-7xl container">
-      {/* Header is now only rendered in the client component */}
-
       {/* Use Suspense to defer rendering of the client component */}
       <Suspense fallback={<div className="min-h-screen" />}>
         <ClientApp
@@ -101,7 +106,8 @@ export default async function ObjectsPage({ searchParams: searchParamsPromise }:
           searchBy={searchBy}
           isOnView={isOnView}
           openAccess={openAccess}
-          departments={departments}
+          filters={filters}
+          currentDepartmentId={currentDepartmentId}
         />
       </Suspense>
     </div>

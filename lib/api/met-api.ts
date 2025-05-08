@@ -100,7 +100,8 @@ async function fetchApiInternal<T>(url: string, options?: RequestInit): Promise<
         const message = errorJson.message || `API Error ${response.status}: ${response.statusText}`;
 
         throw new MetApiError(message, response.status, errorBodyText);
-      } catch (parseOrTextError) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (_) {
         /** If parsing JSON fails or text() fails, use the original text or a generic message */
         throw new MetApiError(
           `API Error ${response.status}: ${response.statusText}. Response: ${errorBodyText.substring(0, 500)}`,
@@ -297,7 +298,7 @@ export async function fetchDepartments(cacheConfig?: CacheConfig): Promise<{ dep
     return { departments: validationResult.data.departments };
   } catch (error) {
     console.error(
-      `fetchDepartments: Failed to fetch departments:`,
+      'fetchDepartments: Failed to fetch departments:',
       error instanceof MetApiError ? `${error.message} (Status: ${error.status})` : error
     );
 
@@ -317,6 +318,9 @@ export async function searchObjects(params: SearchParams, cacheConfig?: CacheCon
   if (!params.q || typeof params.q !== 'string' || params.q.trim() === '') {
     throw new Error("Search query parameter 'q' is required and cannot be empty.");
   }
+
+  /** Default hasImages to true if not explicitly set */
+  const hasImages = params.hasImages !== undefined ? params.hasImages : true;
 
   const endpointUrl = new URL(`${API_BASE_URL}/search`);
 
@@ -346,8 +350,11 @@ export async function searchObjects(params: SearchParams, cacheConfig?: CacheCon
     }
   }
 
-  if (params.hasImages === true) {
+  /**  Always append hasImages (default true) */
+  if (hasImages === true) {
     endpointUrl.searchParams.append('hasImages', 'true');
+  } else if (hasImages === false) {
+    endpointUrl.searchParams.append('hasImages', 'false');
   }
 
   if (params.geoLocation && params.geoLocation.trim() !== '') {

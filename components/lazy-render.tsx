@@ -12,20 +12,24 @@ export function LazyRender({ children, className, rootMargin = '0px' }: LazyRend
 
   useEffect(() => {
     if (!ref.current || isVisible) return;
+
     if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
       setIsVisible(true);
       return;
     }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
+
           observer.disconnect();
         }
       },
       { rootMargin }
     );
     observer.observe(ref.current);
+
     return () => observer.disconnect();
   }, [isVisible, rootMargin]);
 

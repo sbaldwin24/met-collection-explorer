@@ -10,7 +10,8 @@
     "ignore": [
       "build/**/*",
       "dist/**/*",
-      "node_modules"
+      "node_modules",
+      ".next/**/*"
     ],
     "include": [
       "*.{ts,tsx}",

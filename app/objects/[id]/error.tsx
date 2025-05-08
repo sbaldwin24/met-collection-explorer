@@ -12,7 +12,7 @@ export default function ObjectError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    console.error(`Error: ${error}`);
   }, [error]);
 
   return (

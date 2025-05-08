@@ -125,10 +125,9 @@ export function useObjectListData({
         setIsLoading(false);
 
         return;
-      } else {
+      }
         /** If cache has a total but no details, need to fetch details */
         setTotalObjects(cached.totalObjects);
-      }
     }
 
     (async () => {
@@ -221,7 +220,7 @@ export function useObjectListData({
 
                     return { notFound: true } as const;
                   })
-                  .catch(error => {
+                  .catch(_error => {
                     return { notFound: true } as const;
                   });
               })
@@ -293,10 +292,7 @@ export function useObjectListData({
   /** Filtered objectDetails ready for rendering and interaction */
   const validObjectDetails = useMemo(() => {
     const filtered = objectDetails.filter((object): object is ObjectDetails => !('notFound' in object));
-    console.log('useObjectListData: Calculated validObjectDetails:', {
-      count: filtered.length,
-      objectIDs: filtered.slice(0, 3).map(obj => obj.objectID)
-    });
+
     return isOnView
       ? filtered.filter(
           object =>
@@ -310,14 +306,6 @@ export function useObjectListData({
   /** Prefetch logic */
   const prefetchDetailCache = useRef<Map<number, ObjectDetails>>(new Map());
   const prefetchObjectDetail = useCallback(async (objectID: number) => {
-    const cachedDetailRaw = getCachedObjectDetailById(objectID);
-    const cachedDetail: ObjectDetails | undefined =
-      cachedDetailRaw && typeof cachedDetailRaw === 'object' && !('notFound' in cachedDetailRaw)
-        ? cachedDetailRaw
-        : undefined;
-
-    console.log('prefetching', objectID);
-
     if (prefetchDetailCache.current.has(objectID)) return;
 
     try {

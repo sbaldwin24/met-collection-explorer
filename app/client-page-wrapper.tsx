@@ -3,7 +3,6 @@
 import type { Department } from '@/lib/types';
 import dynamic from 'next/dynamic';
 
-// Import the components with SSR explicitly disabled
 const NoSSRApp = dynamic(() => import('@/components/client-app-wrapper'), { ssr: false });
 
 interface ClientPageWrapperProps {

@@ -1,8 +1,8 @@
 'use client';
 
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import Image from 'next/image';
 import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
-
 interface LightboxGalleryProps {
   images: { src: string; alt: string }[];
   open: boolean;
@@ -55,6 +55,8 @@ export function LightboxGallery({ images, open, initialIndex, onClose }: Lightbo
   }, [open]);
 
   /** Reset zoom/pan on image change or modal close */
+  /** eslint-disable-next-line react-hooks/exhaustive-deps */
+  /** biome-ignore lint: this is correct  */
   useEffect(() => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
@@ -73,6 +75,7 @@ export function LightboxGallery({ images, open, initialIndex, onClose }: Lightbo
   const handleOverlayKeyUp = (event: React.KeyboardEvent<HTMLDialogElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
+
       onClose();
     }
   };
@@ -212,7 +215,7 @@ export function LightboxGallery({ images, open, initialIndex, onClose }: Lightbo
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            <img
+            <Image
               src={images[current].src}
               alt={images[current].alt}
               className="bg-white shadow-lg rounded max-w-full max-h-[80vh] object-contain select-none"

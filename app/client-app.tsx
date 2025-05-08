@@ -1,6 +1,5 @@
 'use client';
 
-import type { Department } from '@/lib/types';
 import dynamic from 'next/dynamic';
 
 /** Dynamically import the client component with SSR disabled */
@@ -14,7 +13,13 @@ interface ClientAppProps {
   searchBy: string;
   isOnView?: boolean;
   openAccess?: boolean;
-  departments: Department[];
+  filters: {
+    highlights: boolean;
+    hasImages: boolean;
+    onDisplay: boolean;
+    openAccess: boolean;
+  };
+  currentDepartmentId: string;
 }
 
 export default function ClientApp(props: ClientAppProps) {
@@ -27,9 +32,10 @@ export default function ClientApp(props: ClientAppProps) {
       initialHasImages={props.hasImages}
       initialSearchBy={props.searchBy}
       initialIsOnView={props.isOnView}
-      initialOpenAccess={props.openAccess}
-      basePath="/"
-      departments={props.departments}
+       initialOpenAccess={props.openAccess}
+       basePath="/"
+       filters={props.filters}
+       currentDepartmentId={props.currentDepartmentId}
     />
   );
 }

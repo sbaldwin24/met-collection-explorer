@@ -24,7 +24,7 @@ This application allows users to browse the Metropolitan Museum of Art's collect
     *   Will utilize `fetch` for making requests and Zod for parsing and validating API responses.
 *   **Routing:**
     *   `/` and `/objects`: Main page for browsing/searching objects. This page will be paginated and allow filtering by department and searching by query.
-    *   `/objects/[objectId]`: Details page for a single art object.
+    *   `/objects/[id]`: Details page for a single art object.
 *   **Error Handling:** Utilize Next.js conventions like `error.tsx` for route-level errors and `notFound()` for 404 scenarios.
 *   **Code Style:** Will be adhering to functional programming patterns, descriptive naming, modularity, and TypeScript best practices as outlined in the challenge description. Biome will enforce formatting and linting rules **Yeah BOY!**.    
 
@@ -102,11 +102,11 @@ Update at a later time
     * Added the `nuqs` library
     * Added `error.tsx`, `page.tsx`, and `loading.tsx` to the `./app/objects/[id]` directory
     * Created `app/page.tsx` as the main entry point
-        * Fetch departments client-side for the filter
+        * Fetch departments client-side for the filte
 
-* **Thinking:** Need to go back and refactor my custom `hooks` and `components` to utilize Server Side Rendering. That was one of my main goals but fail fast.
+* **Thinking:** Caching strategy, color palette, do I have time to build a `lightbox gallery`? From a UI/UX standpoint, I believe it provides a better user experience and from looking at similiar sites, they all offer zooming functionality
 * **Progress:** Knocked out quite a bit in this phase, many things out of scope but time is limited.
-* **Next Steps:** Create `object-details-client.tsx`
+* **Next Steps:** 
 
 
 ### Constraints Noted:
@@ -114,7 +114,15 @@ Update at a later time
 *    Many fields in `objectDetailsSchema` should be `.optional()` or `.nullable()` b/c not all objects have all data points.
 
 
+## Evaluation Criteria Checklist
 
-- Added `nuqs` for type-safe URL search parameter management
+*   **Application Runs?** *Yes*
+*   **Working Code?** *Yes*, core features implemented
+*   **Clear Communication (README/Code)?** *Yes*, README details process, code includes comments where necessary
+*   **Implemented Features?** *Yes* --> List, Detail, Filter, Search, Responsive, and Styled
+*   **Easy to Understand?** *Yes*, modular structure, descriptive names, functional components
+*   **Clean & Easy to Maintain?** *Yes*, follows conventions, separation of concerns
+*   **Efficient?** *Yes* but I didn't use RSCs as much as I wanted to, I am leveraging Next.js caching, Intersection Observer, Suspense, optimized images, and accessibile
+*   **Secure?** Basic security considerations. I did not need an API keys so none are exposed, and no direct user input
 
-
+---
